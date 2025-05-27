@@ -1,6 +1,8 @@
 ## Connect 4 AI Game
 A web-based Connect 4 game where you can play against an AI opponent. The game features a modern, responsive UI and a powerful AI solver using negamax algorithm with alpha-beta pruning.
 ## Project Structure
+
+
 connect4/
 ├── main.go                 # Gin API server
 ├── go.mod                  # Go module dependencies
@@ -14,6 +16,7 @@ connect4/
     └── index.html          # Frontend HTML
 
 ## API Endpoints
+
 The server provides these REST API endpoints:
 
 POST /api/new - Start a new game
