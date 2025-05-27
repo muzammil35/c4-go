@@ -1,27 +1,6 @@
 ## Connect 4 AI Game
 A web-based Connect 4 game where you can play against an AI opponent. The game features a modern, responsive UI and a powerful AI solver using negamax algorithm with alpha-beta pruning.
-## Project Structure
 
-
-```
-taskflow-app/
-├── 📄 README.md
-├── 📄 package.json
-├── 📄 package-lock.json
-├── 📄 .gitignore
-├── 📄 .env.example
-├── 📄 docker-compose.yml
-├── 📄 Dockerfile
-├── 🔧 webpack.config.js
-├── 🔧 babel.config.js
-├── 🔧 jest.config.js
-├── 🔧 eslint.config.js
-├── 📁 src/
-│   ├── 📄 index.js
-│   ├── 📄 App.js
-│   ├── 📁 components/
-│   │   ├── 📄
-```
 
 ## API Endpoints
 
