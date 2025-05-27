@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect 4</title>
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+    <h1>Connect 4</h1>
+    <div class="board">
+        {{range .board.Cells}}
+        <div class="row">
+            {{range .}}
+            <div class="cell">{{.}}</div>
+            {{end}}
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>
