@@ -3,33 +3,33 @@ A web-based Connect 4 game where you can play against an AI opponent. The game f
 ## Project Structure
 
 
-connect4/
-├── main.go                 # Gin API server
-├── go.mod                  # Go module dependencies
-├── Position/
-│   └── position.go         # Game position logic
-├── Solver/
-│   └── solver.go           # AI solver logic
-├── Transposition/
-│   └── transposition.go    # Transposition table (you'll need to create this)
-└── templates/
-    └── index.html          # Frontend HTML
+connect4/ <br>
+├── main.go                 # Gin API server <br>
+├── go.mod                  # Go module dependencies <br>
+├── Position/ <br>
+│   └── position.go         # Game position logic <br>
+├── Solver/ <br>
+│   └── solver.go           # AI solver logic <br>
+├── Transposition/ <br>
+│   └── transposition.go    # Transposition table (you'll need to create this) <br>
+└── templates/ <br>
+    └── index.html          # Frontend HTML <br>
 
 ## API Endpoints
 
 The server provides these REST API endpoints:
 
-POST /api/new - Start a new game
-POST /api/move - Make a player move
-GET /api/status - Get current game state 
+POST /api/new - Start a new game <br>
+POST /api/move - Make a player move <br>
+GET /api/status - Get current game state  <br>
 
 
 ## Features
 
-Modern UI: Responsive design with glassmorphism effects
-Real-time gameplay: Immediate feedback and smooth animations
-Powerful AI: Uses your existing negamax solver with alpha-beta pruning
-Visual feedback: Highlights last moves and win conditions
-Mobile friendly: Works on both desktop and mobile devices
+Modern UI: Responsive design with glassmorphism effects <br>
+Real-time gameplay: Immediate feedback and smooth animations <br>
+Powerful AI: Uses your existing negamax solver with alpha-beta pruning <br>
+Visual feedback: Highlights last moves and win conditions <br>
+Mobile friendly: Works on both desktop and mobile devices <br>
 
 
