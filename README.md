@@ -3,17 +3,25 @@ A web-based Connect 4 game where you can play against an AI opponent. The game f
 ## Project Structure
 
 
-connect4/ <br>
-├── main.go                 # Gin API server <br>
-├── go.mod                  # Go module dependencies <br>
-├── Position/ <br>
-│   └── position.go         # Game position logic <br>
-├── Solver/ <br>
-│   └── solver.go           # AI solver logic <br>
-├── Transposition/ <br>
-│   └── transposition.go    # Transposition table (you'll need to create this) <br>
-└── templates/ <br>
-    └── index.html          # Frontend HTML <br>
+```
+taskflow-app/
+├── 📄 README.md
+├── 📄 package.json
+├── 📄 package-lock.json
+├── 📄 .gitignore
+├── 📄 .env.example
+├── 📄 docker-compose.yml
+├── 📄 Dockerfile
+├── 🔧 webpack.config.js
+├── 🔧 babel.config.js
+├── 🔧 jest.config.js
+├── 🔧 eslint.config.js
+├── 📁 src/
+│   ├── 📄 index.js
+│   ├── 📄 App.js
+│   ├── 📁 components/
+│   │   ├── 📄
+```
 
 ## API Endpoints
 
