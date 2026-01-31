@@ -10,6 +10,9 @@ POST /api/new - Start a new game <br>
 POST /api/move - Make a player move <br>
 GET /api/status - Get current game state  <br>
 
+## Try it out
+https://connect4-app-768895558000.northamerica-northeast1.run.app/
+
 
 
 
