@@ -74,7 +74,7 @@ func TestSolver(testfile string) {
 		pos.CurrentPositions = [2]uint64{player1Bs, player2Bs}
 
 		// Run solver
-		result, _ := Solver.Solve(pos, false, 8, 17)
+		result, _ := Solver.Solve(pos, false, 8, 25)
 		
 		fmt.Printf("Position after moves %s:\n", moves)
 		pos.PrintBoard()

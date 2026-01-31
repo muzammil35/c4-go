@@ -1,15 +1,26 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"os"
 
 	"connect4/Position"
 	"connect4/Solver"
 
+	"sync"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
+
+type Game struct {
+	Position *Position.Position
+	mu   sync.Mutex
+}
+
 
 type GameState struct {
 	Board      [][]int `json:"board"`
@@ -21,6 +32,7 @@ type GameState struct {
 }
 
 type MoveRequest struct {
+	GameID string `json:"gameId"`
 	Column int `json:"column"`
 }
 
@@ -31,14 +43,13 @@ type MoveResponse struct {
 	BotMove   int       `json:"botMove,omitempty"`
 }
 
-var gamePosition *Position.Position
+//var gamePosition *Position.Position
 
-func initGame() {
-	gamePosition = Position.NewPosition()
-}
+var games = make(map[string]*Game)
+var gamesMutex sync.Mutex
 
-func getGameState() GameState {
-	board := gamePosition.BoardState()
+func (g *Game) getGameState() GameState {
+	board := g.Position.BoardState()
 	
 	// Flip board vertically for display (top row first)
 	flippedBoard := make([][]int, len(board))
@@ -50,15 +61,15 @@ func getGameState() GameState {
 	gameOver := false
 	
 	// Check for tie
-	if gamePosition.NumMoves == gamePosition.BoardHeight*gamePosition.BoardWidth {
+	if g.Position.NumMoves == g.Position.BoardHeight*g.Position.BoardWidth {
 		winner = 2
 		gameOver = true
 	}
 	
 	// Check for win
-	if gamePosition.NumMoves > 0 && gamePosition.WinningBoardState() {
+	if g.Position.NumMoves > 0 && g.Position.WinningBoardState() {
 		// Winner is the player who made the last move
-		lastPlayer := 1 - gamePosition.GetCurrentPlayer()
+		lastPlayer := 1 - g.Position.GetCurrentPlayer()
 		winner = lastPlayer
 		gameOver = true
 	}
@@ -67,36 +78,43 @@ func getGameState() GameState {
 		Board:         flippedBoard,
 		Winner:        winner,
 		GameOver:      gameOver,
-		LastMove:      gamePosition.LastMove,
-		NumMoves:      gamePosition.NumMoves,
-		CurrentPlayer: gamePosition.GetCurrentPlayer(),
+		LastMove:      g.Position.LastMove,
+		NumMoves:      g.Position.NumMoves,
+		CurrentPlayer: g.Position.GetCurrentPlayer(),
 	}
 }
 
 func newGame(c *gin.Context) {
-	initGame()
-	gameState := getGameState()
+	gameId := uuid.New().String()
+
+	game := &Game{
+		Position: Position.NewPosition(),
+		
+	}
+
+	gamesMutex.Lock()
+	games[gameId] = game
+	gamesMutex.Unlock()
+
+	gameState := game.getGameState()
 	
 	c.JSON(http.StatusOK, gin.H{
 		"success":   true,
 		"message":   "New game started",
 		"gameState": gameState,
+		"gameId": gameId,
+
+
 	})
 }
 
 // makePlayerMove handles the player's move and validation
-func makeMove(c *gin.Context) {
-	var moveReq MoveRequest
-	if err := c.ShouldBindJSON(&moveReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "Invalid request format",
-		})
-		return
-	}
-	
+func (g *Game) makeMove(c *gin.Context, moveReq MoveRequest) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	// Validate column
-	if moveReq.Column < 0 || moveReq.Column >= gamePosition.BoardWidth {
+	if moveReq.Column < 0 || moveReq.Column >= g.Position.BoardWidth {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid column",
@@ -105,7 +123,7 @@ func makeMove(c *gin.Context) {
 	}
 	
 	// Check if column is full
-	if !gamePosition.CanPlay(moveReq.Column) {
+	if !g.Position.CanPlay(moveReq.Column) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Column is full",
@@ -114,7 +132,7 @@ func makeMove(c *gin.Context) {
 	}
 	
 	// Check if game is over
-	currentState := getGameState()
+	currentState := g.getGameState()
 	if currentState.GameOver {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -124,7 +142,7 @@ func makeMove(c *gin.Context) {
 	}
 	
 	// Check if it's player's turn (player is 0)
-	if gamePosition.GetCurrentPlayer() != 0 {
+	if g.Position.GetCurrentPlayer() != 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Not player's turn",
@@ -133,10 +151,10 @@ func makeMove(c *gin.Context) {
 	}
 	
 	// Make player move
-	gamePosition.Play(moveReq.Column)
+	g.Position.Play(moveReq.Column)
 	
 	// Return current game state after player move
-	gameState := getGameState()
+	gameState := g.getGameState()
 	c.JSON(http.StatusOK, MoveResponse{
 		Success:   true,
 		Message:   "Player move made successfully",
@@ -145,9 +163,11 @@ func makeMove(c *gin.Context) {
 }
 
 // getBotMove handles the bot's move logic
-func makeBotMove(c *gin.Context) {
+func (g *Game) makeBotMove(c *gin.Context) {
 	// Check if game is over
-	currentState := getGameState()
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	currentState := g.getGameState()
 	if currentState.GameOver {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -157,7 +177,7 @@ func makeBotMove(c *gin.Context) {
 	}
 	
 	// Check if it's bot's turn (bot is 1)
-	if gamePosition.GetCurrentPlayer() != 1 {
+	if g.Position.GetCurrentPlayer() != 1 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Not bot's turn",
@@ -166,8 +186,8 @@ func makeBotMove(c *gin.Context) {
 	}
 	
 	// Make bot move
-	botMove := Solver.MakeBestMove(gamePosition)
-	if botMove == -1 || !gamePosition.CanPlay(botMove) {
+	botMove := Solver.MakeBestMove(g.Position)
+	if botMove == -1 || !g.Position.CanPlay(botMove) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "Bot could not make a valid move",
@@ -175,10 +195,10 @@ func makeBotMove(c *gin.Context) {
 		return
 	}
 	
-	gamePosition.Play(botMove)
+	g.Position.Play(botMove)
 	
 	// Get final game state after bot move
-	finalGameState := getGameState()
+	finalGameState := g.getGameState()
 	
 	c.JSON(http.StatusOK, MoveResponse{
 		Success:   true,
@@ -189,17 +209,103 @@ func makeBotMove(c *gin.Context) {
 }
 
 
-func getStatus(c *gin.Context) {
-	gameState := getGameState()
+func (g *Game) getStatus(c *gin.Context) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	gameState := g.getGameState()
 	c.JSON(http.StatusOK, gin.H{
 		"success":   true,
 		"gameState": gameState,
 	})
 }
 
+func getGameByID(req MoveRequest) (*Game, error) {
+	
+	gamesMutex.Lock()
+	game, ok := games[req.GameID]
+	gamesMutex.Unlock()
+
+	if !ok {
+		
+		return nil, errors.New("error reading the game from games slice")
+	}
+
+	return game, nil
+}
+
+func moveHandler(c *gin.Context) {
+
+	var moveReq MoveRequest
+	if err := c.ShouldBindJSON(&moveReq); err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid request format",
+		})
+		return
+	}
+	game, err := getGameByID(moveReq)
+	if  err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Could not retrieve Game",
+		})
+		return
+	}
+	game.makeMove(c, moveReq)
+}
+
+func botmoveHandler(c *gin.Context) {
+	var moveReq MoveRequest
+	if err := c.ShouldBindJSON(&moveReq); err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid request format",
+		})
+		return
+	}
+	game, err := getGameByID(moveReq)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Could not retrieve Game",
+		})
+		return
+	}
+	game.makeBotMove(c)
+}
+
+func statusHandler(c *gin.Context) {
+	gameID := c.Query("gameId")
+	if gameID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false})
+		return
+	}
+
+	gamesMutex.Lock()
+	game, ok := games[gameID]
+	gamesMutex.Unlock()
+
+	if !ok {
+		c.JSON(http.StatusNotFound, gin.H{"success": false})
+		return
+	}
+
+	game.mu.Lock()
+	defer game.mu.Unlock()
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":   true,
+		"gameState": game.getGameState(),
+	})
+}
+
+
+
+
 func main() {
-	// Initialize the game
-	initGame()
+	
 	
 	// Create Gin router
 	r := gin.Default()
@@ -215,9 +321,9 @@ func main() {
 	api := r.Group("/api")
 	{
 		api.POST("/new", newGame)
-		api.POST("/move", makeMove)
-		api.POST("/bot", makeBotMove)
-		api.GET("/status", getStatus)
+		api.POST("/move", moveHandler)
+		api.POST("/bot", botmoveHandler)
+		api.GET("/status", statusHandler)
 	}
 	
 	// Serve static files

@@ -169,6 +169,6 @@ func Solve(position *Position.Position, weak bool, loopIters int, searchDepth in
 
 // MakeBestMove analyzes the position and returns the best move
 func MakeBestMove(position *Position.Position) int {
-	_, bestMove := Solve(position, false, 5, 20)
+	_, bestMove := Solve(position, false, 5, 10)
 	return bestMove
 }

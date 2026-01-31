@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/templates/favicon.png" />
     <title>Neon Connect 4 - Play Against AI</title>
     <style>
         * {
@@ -15,18 +16,20 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #111827;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             color: white;
-            overflow-x: hidden;
+            overflow-x: auto;
         }
 
         .game-container {
-            width: 100vw;
+            width: 100%;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
-            padding: 8px;
+            padding: 1rem;
         }
 
         .game-header {
@@ -35,35 +38,20 @@
             flex-shrink: 0;
         }
 
-        h1 {
-            font-size: clamp(1.2em, 2.5vw, 2em);
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-
-        .neon-text {
-            color: #ec4899;
-            text-shadow: 0 0 10px rgba(236, 72, 153, 0.8);
-        }
-
-        .neon-text-blue {
-            color: #3b82f6;
-            text-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
-        }
-
         .game-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 12px;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
             background: rgba(31, 41, 55, 0.8);
-            border-radius: 8px;
+            border-radius: 0.5rem;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(75, 85, 99, 0.3);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            max-width: 280px;
+            max-width: 20rem;
             margin: 0 auto;
-            font-size: clamp(0.8em, 1.5vw, 0.9em);
+            font-size: 0.875rem;
         }
 
         .player-turn {
@@ -87,15 +75,16 @@
             justify-content: center;
             flex: 1;
             width: 100%;
-            max-width: min(92vw, calc(100vh - 140px));
+            max-width: 600px;
             margin: 0 auto;
             min-height: 0;
+            padding: 0.5rem;
         }
 
         .board-container {
             background: rgba(67, 56, 202, 0.4);
-            border-radius: 30px;
-            padding: clamp(20px, 3vw, 40px);
+            border-radius: 1.5rem;
+            padding: 1.25rem;
             box-shadow: 
                 0 0 50px rgba(67, 56, 202, 0.6), 
                 inset 0 0 30px rgba(67, 56, 202, 0.3),
@@ -106,63 +95,14 @@
             backdrop-filter: blur(10px);
         }
 
-        .column-buttons {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: clamp(8px, 1.5vw, 20px);
-            margin-bottom: clamp(15px, 2vw, 25px);
-            padding: 0 clamp(20px, 3vw, 40px);
-            width: 100%;
-        }
-
-        .column-button {
-            background: rgba(31, 41, 55, 0.8);
-            border: 2px solid rgba(75, 85, 99, 0.6);
-            border-radius: 12px;
-            color: #9ca3af;
-            font-weight: bold;
-            padding: clamp(8px, 1.5vw, 15px);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: clamp(40px, 6vw, 60px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .column-button:hover:not(:disabled) {
-            background: rgba(55, 65, 81, 0.9);
-            transform: translateY(-3px);
-            border-color: rgba(107, 114, 128, 0.9);
-            color: white;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        .column-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .arrow-icon {
-            width: clamp(20px, 4vw, 32px);
-            height: clamp(20px, 4vw, 32px);
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            fill: none;
-        }
-
         .board {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             grid-template-rows: repeat(6, 1fr);
-            gap: clamp(8px, 1.5vw, 20px);
-            padding: clamp(20px, 3vw, 40px);
+            gap: 0.5rem;
+            padding: 1rem;
             background: rgba(55, 65, 81, 0.9);
-            border-radius: 20px;
+            border-radius: 1rem;
             box-shadow: 
                 inset 0 6px 15px rgba(0, 0, 0, 0.4),
                 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -174,7 +114,7 @@
 
         .cell {
             width: 100%;
-            height: 100%;
+            aspect-ratio: 1;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -186,12 +126,19 @@
             box-shadow: 
                 inset 0 3px 6px rgba(0, 0, 0, 0.4),
                 0 2px 8px rgba(0, 0, 0, 0.2);
-            min-width: clamp(40px, 8vw, 80px);
-            min-height: clamp(40px, 8vw, 80px);
         }
 
-        .cell:hover {
+        .cell:not(.player-0):not(.player-1):hover {
             transform: scale(1.05);
+            background: rgba(107, 114, 128, 0.6);
+            box-shadow: 
+                inset 0 3px 6px rgba(0, 0, 0, 0.4),
+                0 0 15px rgba(107, 114, 128, 0.4);
+        }
+
+        .cell.player-0,
+        .cell.player-1 {
+            cursor: default;
         }
 
         .cell.player-0 {
@@ -219,17 +166,36 @@
         }
 
         .status {
-            font-size: clamp(0.85em, 1.8vw, 1em);
+            font-size: 3rem;
             font-weight: bold;
-            margin-bottom: 8px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            background: rgba(31, 41, 55, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(75, 85, 99, 0.3);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
-            margin: 0 auto 8px auto;
+            padding: 0.5rem 0.75rem;
+            background: transparent;
+            max-width: 25rem;
+            margin: 0 auto 0.5rem auto;
+        }
+
+        .status.player-turn {
+            color: #ef4444;
+            text-shadow: 
+                0 0 10px rgba(239, 68, 68, 0.8),
+                0 0 20px rgba(239, 68, 68, 0.6),
+                0 0 30px rgba(239, 68, 68, 0.4);
+        }
+
+        .status.ai-turn {
+            color: #3b82f6;
+            text-shadow: 
+                0 0 10px rgba(59, 130, 246, 0.8),
+                0 0 20px rgba(59, 130, 246, 0.6),
+                0 0 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .status.game-over {
+            color: #22c55e;
+            text-shadow: 
+                0 0 10px rgba(34, 197, 94, 0.8),
+                0 0 20px rgba(34, 197, 94, 0.6),
+                0 0 30px rgba(34, 197, 94, 0.4);
         }
 
         .controls {
@@ -241,11 +207,11 @@
         .btn {
             background: #7c3aed;
             border: none;
-            border-radius: 6px;
+            border-radius: 0.375rem;
             color: white;
-            font-size: clamp(0.8em, 1.5vw, 0.9em);
+            font-size: 0.875rem;
             font-weight: bold;
-            padding: 6px 15px;
+            padding: 0.5rem 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 0 12px rgba(147, 51, 234, 0.6);
@@ -262,27 +228,7 @@
             transform: translateY(0);
         }
 
-        .winner {
-            background: rgba(34, 197, 94, 0.3);
-            border-color: rgba(34, 197, 94, 0.6);
-            animation: pulse 2s infinite;
-        }
 
-        .tie {
-            background: rgba(168, 85, 247, 0.3);
-            border-color: rgba(168, 85, 247, 0.6);
-            color: #a855f7;
-            text-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { 
-                transform: scale(1.02); 
-                box-shadow: 0 0 30px rgba(34, 197, 94, 0.7);
-            }
-            100% { transform: scale(1); }
-        }
 
         .loading {
             display: inline-block;
@@ -330,255 +276,98 @@
             position: relative;
         }
 
-        /* Neon glow effects for different states */
-        .winner.player-0 {
-            color: #ec4899;
-            text-shadow: 0 0 15px rgba(236, 72, 153, 0.8);
-        }
-
-        .winner.player-1 {
-            color: #3b82f6;
-            text-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
-        }
-
         /* Column hover effects */
         .board:hover .cell:not(.player-0):not(.player-1) {
             background: rgba(55, 65, 81, 0.8);
         }
 
-        /* Last column highlight */
-        .column-button.last-column {
-            background: rgba(31, 41, 55, 0.9);
-            border-color: rgba(107, 114, 128, 0.9);
-            box-shadow: 0 0 15px rgba(107, 114, 128, 0.5);
-        }
-
         /* Mobile-specific fixes */
         @media (max-width: 768px) {
             .game-container {
-                padding: 3px;
+                padding: 0.5rem;
             }
 
             .board-section {
-                max-width: min(85vw, calc(100vh - 120px));
+                max-width: 100%;
+                padding: 0.25rem;
             }
 
             .board-container {
-                padding: clamp(12px, 2vw, 25px);
-                border-radius: 20px;
+                padding: 1rem;
+                border-radius: 1.25rem;
             }
 
             .board-container::before {
-                top: -10px;
-                left: -10px;
-                right: -10px;
-                bottom: -10px;
+                top: -0.625rem;
+                left: -0.625rem;
+                right: -0.625rem;
+                bottom: -0.625rem;
                 filter: blur(15px);
-                border-radius: 25px;
-            }
-
-            .column-buttons {
-                gap: clamp(4px, 1vw, 12px);
-                padding: 0 clamp(12px, 2vw, 25px);
+                border-radius: 1.5rem;
             }
 
             .board {
-                gap: clamp(4px, 1vw, 12px);
-                padding: clamp(12px, 2vw, 25px);
-                border-radius: 15px;
-            }
-
-            .cell {
-                min-width: clamp(25px, 6vw, 50px);
-                min-height: clamp(25px, 6vw, 50px);
+                gap: 0.375rem;
+                padding: 0.75rem;
+                border-radius: 0.875rem;
             }
 
             .game-info {
-                max-width: 220px;
-                padding: 4px 8px;
-                font-size: 0.7em;
-            }
-
-            h1 {
-                font-size: clamp(0.9em, 1.8vw, 1.3em);
-                margin-bottom: 3px;
+                max-width: 14rem;
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
             }
 
             .status {
-                font-size: clamp(0.75em, 1.5vw, 0.85em);
-                padding: 6px 8px;
-                margin-bottom: 6px;
+                font-size: 2.5rem;
             }
 
             .btn {
-                font-size: clamp(0.7em, 1.3vw, 0.8em);
-                padding: 4px 10px;
+                font-size: 0.8125rem;
+                padding: 0.375rem 0.75rem;
             }
         }
 
         @media (max-width: 480px) {
             .game-container {
-                padding: 2px;
+                padding: 0.375rem;
             }
 
             .board-section {
-                max-width: min(82vw, calc(100vh - 100px));
+                padding: 0.125rem;
             }
 
             .board-container {
-                padding: clamp(8px, 1.5vw, 20px);
-                border-radius: 15px;
+                padding: 0.75rem;
+                border-radius: 1rem;
             }
 
             .board-container::before {
-                top: -8px;
-                left: -8px;
-                right: -8px;
-                bottom: -8px;
+                top: -0.5rem;
+                left: -0.5rem;
+                right: -0.5rem;
+                bottom: -0.5rem;
                 filter: blur(12px);
-                border-radius: 20px;
-            }
-
-            .column-buttons {
-                gap: clamp(3px, 0.8vw, 8px);
-                padding: 0 clamp(8px, 1.5vw, 20px);
+                border-radius: 1.25rem;
             }
 
             .board {
-                gap: clamp(3px, 0.8vw, 8px);
-                padding: clamp(8px, 1.5vw, 20px);
-                border-radius: 12px;
-            }
-
-            .cell {
-                min-width: clamp(20px, 5vw, 40px);
-                min-height: clamp(20px, 5vw, 40px);
-            }
-
-            .column-button {
-                height: clamp(30px, 4vw, 45px);
-                border-radius: 8px;
-            }
-
-            .arrow-icon {
-                width: clamp(16px, 3vw, 24px);
-                height: clamp(16px, 3vw, 24px);
-            }
-
-            h1 {
-                font-size: clamp(0.8em, 1.6vw, 1.1em);
-                margin-bottom: 2px;
+                gap: 0.25rem;
+                padding: 0.5rem;
+                border-radius: 0.75rem;
             }
 
             .game-info {
-                max-width: 180px;
-                padding: 3px 6px;
-                font-size: 0.65em;
+                max-width: 12rem;
+                padding: 0.1875rem 0.375rem;
+                font-size: 0.6875rem;
             }
 
-            .status {
-                font-size: clamp(0.7em, 1.3vw, 0.75em);
-                padding: 4px 6px;
-                margin-bottom: 4px;
-            }
+            
 
             .btn {
-                font-size: clamp(0.65em, 1.2vw, 0.7em);
-                padding: 3px 8px;
-            }
-        }
-
-        @media (max-height: 700px) {
-            .game-container {
-                padding: 5px;
-            }
-
-            .board-section {
-                max-width: min(90vw, calc(100vh - 100px));
-            }
-
-            h1 {
-                font-size: clamp(0.9em, 2vw, 1.3em);
-                margin-bottom: 3px;
-            }
-
-            .game-header {
-                margin-bottom: 5px;
-            }
-
-            .game-footer {
-                margin-top: 5px;
-            }
-
-            .game-info {
-                padding: 4px 8px;
-                font-size: 0.7em;
-            }
-
-            .status {
-                font-size: clamp(0.75em, 1.5vw, 0.85em);
-                padding: 5px 8px;
-                margin-bottom: 5px;
-            }
-
-            .btn {
-                font-size: clamp(0.7em, 1.3vw, 0.8em);
-                padding: 4px 10px;
-            }
-        }
-
-        @media (max-height: 600px) {
-            .board-section {
-                max-width: min(88vw, calc(100vh - 80px));
-            }
-
-            h1 {
-                font-size: clamp(0.8em, 1.8vw, 1.1em);
-                margin-bottom: 2px;
-            }
-
-            .game-header {
-                margin-bottom: 3px;
-            }
-
-            .game-footer {
-                margin-top: 3px;
-            }
-
-            .game-info {
-                padding: 3px 6px;
-                font-size: 0.65em;
-                max-width: 200px;
-            }
-
-            .status {
-                font-size: clamp(0.7em, 1.3vw, 0.75em);
-                padding: 4px 6px;
-                margin-bottom: 3px;
-            }
-
-            .btn {
-                font-size: clamp(0.65em, 1.2vw, 0.7em);
-                padding: 3px 8px;
-            }
-        }
-
-        @media (max-height: 500px) {
-            .board-section {
-                max-width: min(85vw, calc(100vh - 60px));
-            }
-
-            h1 {
-                font-size: clamp(0.7em, 1.5vw, 0.9em);
-                margin-bottom: 1px;
-            }
-
-            .game-header {
-                margin-bottom: 2px;
-            }
-
-            .game-footer {
-                margin-top: 2px;
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
             }
         }
     </style>
@@ -586,77 +375,27 @@
 <body>
     <div class="game-container">
         <div class="game-header">
-            <h1>
-                <span class="neon-text">Neon</span> 
-                <span class="neon-text-blue">Connect 4</span>
-            </h1>
+            <div class="status player-turn" id="gameStatus">
+                Click a cell to drop your piece
+            </div>
             
-            <div class="game-info">
+            <!-- <div class="game-info">
                 <div class="player-turn" id="currentPlayerDisplay">
                     Your Turn (Pink)
                 </div>
                 <div>
                     Moves: <span id="moveCount">0</span>
                 </div>
-            </div>
+            </div> -->
         </div>
 
         <div class="board-section">
             <div class="board-container">
-                <div class="column-buttons" id="columnButtons">
-                    <button class="column-button" onclick="makeMove(0)">
-                        <svg class="arrow-icon" viewBox="0 0 24 24">
-                            <path d="M12 5v14" />
-                            <path d="m19 12-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <button class="column-button" onclick="makeMove(1)">
-                        <svg class="arrow-icon" viewBox="0 0 24 24">
-                            <path d="M12 5v14" />
-                            <path d="m19 12-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <button class="column-button" onclick="makeMove(2)">
-                        <svg class="arrow-icon" viewBox="0 0 24 24">
-                            <path d="M12 5v14" />
-                            <path d="m19 12-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <button class="column-button" onclick="makeMove(3)">
-                        <svg class="arrow-icon" viewBox="0 0 24 24">
-                            <path d="M12 5v14" />
-                            <path d="m19 12-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <button class="column-button" onclick="makeMove(4)">
-                        <svg class="arrow-icon" viewBox="0 0 24 24">
-                            <path d="M12 5v14" />
-                            <path d="m19 12-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <button class="column-button" onclick="makeMove(5)">
-                        <svg class="arrow-icon" viewBox="0 0 24 24">
-                            <path d="M12 5v14" />
-                            <path d="m19 12-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <button class="column-button" onclick="makeMove(6)">
-                        <svg class="arrow-icon" viewBox="0 0 24 24">
-                            <path d="M12 5v14" />
-                            <path d="m19 12-7 7-7-7" />
-                        </svg>
-                    </button>
-                </div>
-
                 <div class="board" id="gameBoard"></div>
             </div>
         </div>
 
         <div class="game-footer">
-            <div class="status" id="gameStatus">
-                Make your move! Click a column to drop your piece.
-            </div>
-
             <div class="controls">
                 <button class="btn" onclick="newGame()">New Game</button>
             </div>
@@ -666,6 +405,7 @@
     <script>
         let gameState = null;
         let isProcessing = false;
+        let gameId = null;
 
         // Initialize the game when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -697,30 +437,23 @@
             if (isProcessing) return;
             
             isProcessing = true;
-            updateStatus('Starting new game...');
-            disableColumnButtons();
+            updateStatus('Starting new game...', 'player-turn');
             
             try {
                 const result = await makeApiCall('/api/new', 'POST');
                 
                 if (result.success) {
                     gameState = result.gameState;
+                    gameId = result.gameId;
+                    console.log(gameId);
                     renderBoard();
                     updateUI();
-                    
-                    setTimeout(() => {
-                        if (gameState && !gameState.gameOver && gameState.currentPlayer === 0) {
-                            enableColumnButtons();
-                        }
-                    }, 100);
                 } else {
-                    updateStatus('Failed to start new game: ' + result.message);
-                    enableColumnButtons();
+                    updateStatus('Failed to start new game: ' + result.message, 'player-turn');
                 }
             } catch (error) {
                 console.error('Error in newGame:', error);
-                updateStatus('Failed to start new game');
-                enableColumnButtons();
+                updateStatus('Failed to start new game', 'player-turn');
             } finally {
                 isProcessing = false;
             }
@@ -729,6 +462,11 @@
         let previousGameState = null;
 
         async function makeMove(column) {
+            // Check if column is full
+            if (gameState.board[0][column] !== -1) {
+                return;
+            }
+            
             if (isProcessing || !gameState || gameState.gameOver || gameState.currentPlayer !== 0) {
                 return;
             }
@@ -736,116 +474,81 @@
             isProcessing = true;
     
             try {
-                updateStatus('Making your move...<span class="loading"></span>');
-                disableColumnButtons();
-                updateColumnHighlight(column);
-        
-                previousGameState = JSON.parse(JSON.stringify(gameState));
+                updateStatus('Making your move...<span class="loading"></span>', 'player-turn');
         
                 // Step 1: Make player move
-                const playerResult = await makeApiCall('/api/move', 'POST', { column: column });
+                console.log('Sending payload:', { gameId: String(gameId), column: column });
+                const playerResult = await makeApiCall('/api/move', 'POST', { gameId: String(gameId), column: column });
         
                 if (!playerResult.success) {
-                    updateStatus('Invalid move: ' + playerResult.message);
+                    updateStatus('Invalid move: ' + playerResult.message, 'player-turn');
+                    isProcessing = false;
                     return;
                 }
         
                 // Update game state with player move
                 gameState = playerResult.gameState;
                 renderBoard();
-                updateStatus('Your move placed!');
+                updateStatus('Your move placed!', 'player-turn');
         
                 // Check if game is over after player move
                 if (gameState.gameOver) {
                     updateUI();
+                    isProcessing = false;
                     return;
                 }
         
                 // Step 2: Get bot move after a short delay
                 setTimeout(async () => {
                     try {
-                        updateStatus('AI is thinking...<span class="loading"></span>');
-                        const currentPlayerDisplay = document.getElementById('currentPlayerDisplay');
-                        currentPlayerDisplay.textContent = 'AI Turn (Blue)';
-                        currentPlayerDisplay.className = 'player-turn player-1';
+                        updateStatus('AI is thinking...<span class="loading"></span>', 'ai-turn');
+                        //const currentPlayerDisplay = document.getElementById('currentPlayerDisplay');
+                        //currentPlayerDisplay.textContent = 'AI Turn (Blue)';
+                        //currentPlayerDisplay.className = 'player-turn player-1';
                 
-                        const botResult = await makeApiCall('/api/bot', 'POST', {});
+                        const botResult = await makeApiCall('/api/bot', 'POST', {gameId});
                 
                         if (botResult.success) {
                             // Update game state with bot move
                             gameState = botResult.gameState;
                             renderBoard();
-                            updateColumnHighlight(botResult.botMove);
                             updateUI();
                         } else {
                             console.error('Bot move failed:', botResult.message);
-                            updateStatus('Bot move failed: ' + botResult.message);
-                            // Still update UI in case we need to re-enable buttons
+                            updateStatus('Bot move failed: ' + botResult.message, 'ai-turn');
                             updateUI();
                         }
                     } catch (error) {
                         console.error('Error getting bot move:', error);
-                        updateStatus('Bot move failed due to network error');
+                        updateStatus('Bot move failed due to network error', 'ai-turn');
                         updateUI();
+                    } finally {
+                        isProcessing = false;
                     }
                 }, 500);
         
             } catch (error) {
                 console.error('Error making player move:', error);
-                updateStatus('Move failed due to network error');
-            } finally {
+                updateStatus('Move failed due to network error', 'player-turn');
                 isProcessing = false;
-                // Re-enable buttons if it's still player's turn and game isn't over
-                setTimeout(() => {
-                    if (gameState && !gameState.gameOver && gameState.currentPlayer === 0) {
-                        enableColumnButtons();
-                    }
-                }, 100);
             }
-        }
-
-        function updateColumnHighlight(column) {
-            const buttons = document.querySelectorAll('.column-button');
-            buttons.forEach(btn => btn.classList.remove('last-column'));
-            
-            if (column !== undefined && column >= 0 && column < 7) {
-                buttons[column].classList.add('last-column');
-            }
-        }
-
-        function reconstructPlayerOnlyState(prevState, fullState, playerColumn) {
-            const playerState = JSON.parse(JSON.stringify(prevState));
-            
-            for (let row = playerState.board.length - 1; row >= 0; row--) {
-                if (playerState.board[row][playerColumn] === -1) {
-                    playerState.board[row][playerColumn] = 0;
-                    break;
-                }
-            }
-            
-            playerState.numMoves = prevState.numMoves + 1;
-            playerState.currentPlayer = 1;
-            playerState.lastMove = playerColumn;
-            
-            return playerState;
         }
 
         async function loadGameStatus() {
             try {
-                const result = await makeApiCall('/api/status');
+                const result = await makeApiCall(`/api/status?gameId=${gameId}`);
                 
                 if (result.success) {
                     gameState = result.gameState;
                     renderBoard();
                     updateUI();
-                    updateColumnHighlight(gameState.lastMove);
                 } else {
-                    updateStatus('Failed to load game status');
+                    updateStatus('Failed to load game status', 'player-turn');
                     newGame();
                 }
             } catch (error) {
                 console.error('Error loading game status:', error);
-                updateStatus('Failed to load game');
+                updateStatus('Failed to load game', 'player-turn');
                 newGame();
             }
         }
@@ -868,6 +571,9 @@
                         cell.classList.add('player-0');
                     } else if (cellValue === 1) {
                         cell.classList.add('player-1');
+                    } else {
+                        // Empty cell - make it clickable
+                        cell.onclick = () => makeMove(col);
                     }
                     
                     if (gameState.lastMove !== -1 && col === gameState.lastMove && cellValue !== -1) {
@@ -891,38 +597,33 @@
         function updateUI() {
             if (!gameState) return;
             
-            document.getElementById('moveCount').textContent = gameState.numMoves;
+            //document.getElementById('moveCount').textContent = gameState.numMoves;
             
-            const currentPlayerDisplay = document.getElementById('currentPlayerDisplay');
+            //const currentPlayerDisplay = document.getElementById('currentPlayerDisplay');
             
             if (gameState.gameOver) {
                 if (gameState.winner === 0) {
-                    updateStatus('🎉 You Win! 🎉', 'winner player-0');
-                    currentPlayerDisplay.textContent = 'You Won!';
-                    currentPlayerDisplay.className = 'player-turn player-0';
+                    updateStatus('You Win!', 'game-over');
+                    //currentPlayerDisplay.textContent = 'You Won!';
+                    //currentPlayerDisplay.className = 'player-turn player-0';
                 } else if (gameState.winner === 1) {
-                    updateStatus('🤖 AI Wins! 🤖', 'winner player-1');
-                    currentPlayerDisplay.textContent = 'AI Won!';
-                    currentPlayerDisplay.className = 'player-turn player-1';
+                    updateStatus('AI Wins!', 'game-over');
+                    //currentPlayerDisplay.textContent = 'AI Won!';
+                    //currentPlayerDisplay.className = 'player-turn player-1';
                 } else if (gameState.winner === 2) {
-                    updateStatus('🤝 It\'s a Tie! 🤝', 'tie');
-                    currentPlayerDisplay.textContent = 'Tie Game!';
-                    currentPlayerDisplay.className = 'player-turn';
+                    updateStatus('It\'s a Tie!', 'game-over');
+                    //currentPlayerDisplay.textContent = 'Tie Game!';
+                    //currentPlayerDisplay.className = 'player-turn';
                 }
-                disableColumnButtons();
             } else {
                 if (gameState.currentPlayer === 0) {
-                    updateStatus('Your turn! Click a column');
-                    currentPlayerDisplay.textContent = 'Your Turn (Pink)';
-                    currentPlayerDisplay.className = 'player-turn player-0';
-                    if (!isProcessing) {
-                        enableColumnButtons();
-                    }
+                    updateStatus('Your turn! Click a cell', 'player-turn');
+                    //currentPlayerDisplay.textContent = 'Your Turn (Pink)';
+                    //currentPlayerDisplay.className = 'player-turn player-0';
                 } else {
-                    updateStatus('AI is thinking...<span class="loading"></span>');
-                    currentPlayerDisplay.textContent = 'AI Turn (Blue)';
-                    currentPlayerDisplay.className = 'player-turn player-1';
-                    disableColumnButtons();
+                    updateStatus('AI is thinking...<span class="loading"></span>', 'ai-turn');
+                    //currentPlayerDisplay.textContent = 'AI Turn (Blue)';
+                    //currentPlayerDisplay.className = 'player-turn player-1';
                 }
             }
         }
@@ -932,23 +633,7 @@
             statusElement.innerHTML = message;
             statusElement.className = 'status ' + className;
         }
-
-        function disableColumnButtons() {
-            const buttons = document.querySelectorAll('.column-button');
-            buttons.forEach(button => {
-                button.disabled = true;
-            });
-        }
-
-        function enableColumnButtons() {
-            if (!gameState || gameState.gameOver || isProcessing) return;
-            
-            const buttons = document.querySelectorAll('.column-button');
-            buttons.forEach((button, index) => {
-                const isColumnFull = gameState.board && gameState.board[0][index] !== -1;
-                button.disabled = isColumnFull;
-            });
-        }
     </script>
 </body>
 </html>
+
