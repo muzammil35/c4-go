@@ -11,12 +11,5 @@ POST /api/move - Make a player move <br>
 GET /api/status - Get current game state  <br>
 
 
-## Features
-
-Modern UI: Responsive design with glassmorphism effects <br>
-Real-time gameplay: Immediate feedback and smooth animations <br>
-Powerful AI: Uses your existing negamax solver with alpha-beta pruning <br>
-Visual feedback: Highlights last moves and win conditions <br>
-Mobile friendly: Works on both desktop and mobile devices <br>
 
 
